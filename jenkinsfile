@@ -1,0 +1,63 @@
+
+pipeline {
+    agent any
+
+    stages {
+
+        stage("Clean Workspace") {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage("Git Checkout") {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/premkumarvarkala-ui/image-to-sound-python-.git'
+            }
+        }
+
+        stage("Python Version") {
+            steps {
+                sh '''
+                    which python3
+                    python3 --version
+                '''
+            }
+        }
+
+        stage("Install Dependencies") {
+            steps {
+                sh '''
+                    if [ -f requirements.txt ]; then
+                        python3 -m pip install -r requirements.txt
+                    else
+                        echo "No requirements.txt found"
+                    fi
+                '''
+            }
+        }
+
+        stage("Run Python Script") {
+            steps {
+                sh 'python3 hello.py'
+            }
+        }
+
+        stage("Verify Execution") {
+            steps {
+                echo 'Python execution completed. Check console output.'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Python execution completed successfully!'
+        }
+
+        failure {
+            echo 'Python execution failed!'
+        }
+    }
+}
